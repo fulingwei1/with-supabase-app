@@ -1,10 +1,8 @@
 import { ImageGenerationPage } from "@/components/image-generation-page";
-import { Hero } from "@/components/ui/hero-with-group-of-images-text-and-two-buttons";
 
 export default function Home() {
   return (
-    <main className="flex flex-col">
-      <Hero />
+    <main className="min-h-screen bg-background">
       <ImageGenerationPage />
     </main>
   );

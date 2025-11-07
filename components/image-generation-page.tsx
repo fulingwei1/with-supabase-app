@@ -22,11 +22,11 @@ export function ImageGenerationPage() {
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 py-8">
+    <div className="w-full max-w-7xl mx-auto px-6 py-12">
       {/* 顶部输入区域 */}
-      <div className="mb-8">
-        <div className="flex gap-4 items-center flex-wrap">
-          <div className="flex-1 min-w-[300px]">
+      <div className="mb-12">
+        <div className="flex gap-4 items-center">
+          <div className="flex-1">
             <Input
               type="text"
               placeholder="输入您的提示词，例如：一只可爱的猫咪坐在窗台上"
@@ -40,8 +40,8 @@ export function ImageGenerationPage() {
               }}
             />
           </div>
-          <div className="flex items-center gap-4 flex-shrink-0">
-            <div className="flex items-center gap-2 px-4 py-2 bg-muted rounded-md border">
+          <div className="flex items-center gap-3 flex-shrink-0">
+            <div className="flex items-center gap-2 px-4 py-2 bg-muted rounded-md border border-border">
               <Sparkles className="w-4 h-4 text-primary" />
               <span className="font-semibold text-base">{points}</span>
               <span className="text-sm text-muted-foreground">点数</span>
@@ -69,7 +69,7 @@ export function ImageGenerationPage() {
           // 占位卡片 - 提示用户生成图片，默认显示4个
           <>
             {Array.from({ length: 4 }).map((_, index) => (
-              <Card key={index} className="aspect-square border-dashed">
+              <Card key={index} className="aspect-square border-dashed border-2">
                 <CardContent className="flex flex-col items-center justify-center h-full p-6">
                   <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
                     <ImageIcon className="w-8 h-8 text-muted-foreground" />
@@ -87,12 +87,12 @@ export function ImageGenerationPage() {
         ) : (
           // 显示生成的图片
           images.map((image, index) => (
-            <Card key={index} className="aspect-square overflow-hidden p-0">
+            <Card key={index} className="aspect-square overflow-hidden p-0 border">
               <CardContent className="p-0 h-full">
                 <img
                   src={image.url}
                   alt={`生成的图片 ${index + 1}`}
-                  className="w-full h-full object-cover rounded-lg"
+                  className="w-full h-full object-cover"
                 />
               </CardContent>
             </Card>
