@@ -29,7 +29,6 @@ export function SignUpForm({
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    const supabase = createClient();
     setIsLoading(true);
     setError(null);
 
@@ -40,18 +39,91 @@ export function SignUpForm({
     }
 
     try {
-      const { error } = await supabase.auth.signUp({
+      // 检查环境变量是否在客户端可用
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY;
+      
+      if (!supabaseUrl || !supabaseKey) {
+        setError("Supabase 环境变量未配置。请检查 .env.local 文件并重启开发服务器。");
+        setIsLoading(false);
+        return;
+      }
+
+      // 先测试网络连接（可选，如果失败会继续尝试注册）
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5秒超时
+        
+        const testResponse = await fetch(`${supabaseUrl}/rest/v1/`, {
+          method: 'HEAD',
+          headers: {
+            'apikey': supabaseKey,
+          },
+          signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+        
+        if (!testResponse.ok && testResponse.status !== 404) {
+          throw new Error(`连接测试失败: ${testResponse.status}`);
+        }
+      } catch (testError: unknown) {
+        if (testError instanceof Error && testError.name === 'AbortError') {
+          setError("连接超时。无法访问 Supabase 服务器，请检查：1) 网络连接 2) 是否需要配置代理/VPN 3) 防火墙设置");
+          setIsLoading(false);
+          return;
+        } else if (testError instanceof TypeError || (testError instanceof Error && (testError.message.includes('fetch') || testError.message.includes('Failed to fetch')))) {
+          setError("无法连接到 Supabase 服务器。可能原因：1) 网络连接问题 2) 需要代理/VPN 3) DNS 解析失败。请检查网络设置或联系网络管理员。");
+          setIsLoading(false);
+          return;
+        } else {
+          // 连接测试失败，但继续尝试注册（可能是认证端点不同）
+          console.warn("连接测试警告:", testError);
+        }
+      }
+
+      const supabase = createClient();
+      
+      // 尝试注册
+      const { error, data } = await supabase.auth.signUp({
         email,
         password,
         options: {
           emailRedirectTo: `${window.location.origin}/protected`,
         },
       });
-      if (error) throw error;
+      
+      if (error) {
+        // Supabase 返回的错误
+        console.error("Supabase 错误:", error);
+        if (error.message.includes("fetch") || error.message.includes("network") || error.message.includes("Failed to fetch")) {
+          setError("网络连接失败。可能原因：1) 网络连接问题 2) 需要代理/VPN 3) Supabase 服务暂时不可用。请检查网络连接或稍后重试。");
+        } else if (error.message.includes("Invalid API key") || error.message.includes("JWT")) {
+          setError("配置错误，请检查 Supabase 环境变量配置");
+        } else if (error.message.includes("User already registered")) {
+          setError("该邮箱已被注册，请直接登录");
+        } else {
+          setError(error.message);
+        }
+        setIsLoading(false);
+        return;
+      }
+
+      // 注册成功
       router.push("/auth/sign-up-success");
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "发生错误，请重试");
-    } finally {
+      // 捕获其他类型的错误（如环境变量未配置、网络错误等）
+      console.error("注册错误:", error);
+      if (error instanceof Error) {
+        if (error.message.includes("环境变量未配置") || error.message.includes("URL 格式不正确")) {
+          setError(error.message);
+        } else if (error.message.includes("Failed to fetch") || error.message.includes("fetch") || error.name === "TypeError") {
+          setError("网络连接失败。请检查：1) 网络连接是否正常 2) 是否能访问 Supabase 服务 3) 是否需要配置代理/VPN");
+        } else {
+          setError(error.message || "发生未知错误，请稍后重试");
+        }
+      } else {
+        setError("发生未知错误，请稍后重试");
+      }
       setIsLoading(false);
     }
   };

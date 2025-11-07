@@ -11,8 +11,8 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "Next.js and Supabase Starter Kit",
-  description: "The fastest way to build apps with Next.js and Supabase",
+  title: "AI 文生图 - 一句话生成震撼视觉",
+  description: "输入灵感，AI 即刻为你打造电影级画面。用光影讲故事，用色彩定义品牌，让每次创作都成为高光时刻。",
 };
 
 const geistSans = Geist({
@@ -27,7 +27,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="zh-CN" suppressHydrationWarning>
       <body className={`${geistSans.className} antialiased`}>
         <ThemeProvider
           attribute="class"
@@ -59,7 +59,7 @@ export default function RootLayout({
                 ),
               },
               {
-                name: "登陆",
+                name: "登录",
                 link: "/auth/sign-in",
                 icon: (
                   <LogIn className="h-4 w-4 text-neutral-500 dark:text-white" />

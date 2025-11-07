@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { MoveRight, PhoneCall } from "lucide-react";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -22,11 +23,15 @@ function Hero() {
               </p>
             </div>
             <div className="flex flex-row gap-4">
-              <Button size="lg" className="gap-3" variant="outline">
-                预约专属顾问 <PhoneCall className="w-5 h-5" />
+              <Button size="lg" className="gap-3" variant="outline" asChild>
+                <Link href="/auth/sign-in">
+                  免费体验 <PhoneCall className="w-5 h-5" />
+                </Link>
               </Button>
-              <Button size="lg" className="gap-3">
-                立即生成图像 <MoveRight className="w-5 h-5" />
+              <Button size="lg" className="gap-3" asChild>
+                <Link href="/auth/sign-up">
+                  立即注册 <MoveRight className="w-5 h-5" />
+                </Link>
               </Button>
             </div>
           </div>

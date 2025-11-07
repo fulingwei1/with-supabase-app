@@ -47,8 +47,12 @@ export async function updateSession(request: NextRequest) {
   const { data } = await supabase.auth.getClaims();
   const user = data?.claims;
 
+  // 公开页面，不需要登录即可访问
+  const publicPaths = ["/", "/about", "/support"];
+  const isPublicPath = publicPaths.includes(request.nextUrl.pathname);
+
   if (
-    request.nextUrl.pathname !== "/" &&
+    !isPublicPath &&
     !user &&
     !request.nextUrl.pathname.startsWith("/sign-in") &&
     !request.nextUrl.pathname.startsWith("/auth")
